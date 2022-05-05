@@ -9,10 +9,10 @@ The system is configured over Serial.
 The commands are as follows.  
 
 "WifiSSID->SSID" where SSID is your SSID of your wifi  
-"WifiPasss->PASS" where PASS is your Wifi Password  
+"WifiPass->PASS" where PASS is your Wifi Password  
 "SetCall->CALL" where CALL is your callsign  
 "SetRefName->NAME" where NAME is the reflector name (example M17-M17)  
 "SetRefIp->0.0.0.0" where 0.0.0.0 is the IP of the reflector. Currently do not support IPv6  
-"SetRefPort->17000" where 7000 is the port.   
+"SetRefPort->17000" where 17000 is the port.   
 "SetModule->C" where C is the Module letter.  
 "Save" Saves current settings into EEPROM, rest the board after this to allow it to read the config and connect.  

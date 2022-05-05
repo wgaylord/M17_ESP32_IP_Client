@@ -357,7 +357,7 @@ void loop()
 		{
 			sprintf(config.wifi_ssid, command.substring(10).c_str());
 		}
-		if (command.startsWith(F("WifiPasss->")))
+		if (command.startsWith(F("WifiPass->")))
 		{
 			sprintf(config.wifi_pass, command.substring(10).c_str());
 		}
@@ -523,9 +523,6 @@ void taskNetwork(void *pvParameters)
 				transmitM17();
 			}
 		}
-		else
-		{
-			Serial.print(".");
-		}
 	}
 }
+
