@@ -1,110 +1,54 @@
 #ifndef MAIN_H
-
 #define MAIN_H
-
-
 
 #define VERSION "0.1"
 
-
-
 #define DEBUG
-
-
 
 //#define SDCARD
 
-
-
 #define IMPLEMENTATION FIFO
 
-
-
 #include <Arduino.h>
-
 #include <cppQueue.h>
-
 #include <codec2.h>
-
 #include "soc/rtc_wdt.h"
 
-
-
 #include "HardwareSerial.h"
-
 #include "EEPROM.h"
 
-
-
 enum M17Flags
-
 {
-
 	DISCONNECTED = 1 << 0,
-
 	CONNECTING = 1 << 1,
-
 	M17_AUTH = 1 << 2,
-
 	M17_CONF = 1 << 3,
-
 	M17_OPTS = 1 << 4,
-
 	CONNECTED_RW = 1 << 5,
-
 	CONNECTED_RO = 1 << 6
-
 };
 
-
-
-typedef struct Reflector_Struct 
-
+typedef struct Reflector_Struct
 {
-
-	char designator[3]; //Last 3 characters of a reflector name
-    uint32_t  ipv4; //IPv4 Address packed into bytes
-    uint8_t  ipv6[16]; //IPv6 Address packed into bytes
-	uint16_t port; //Port
-} Reflector;
-
-typedef struct Current_Ref_Struct
-{
-	char host[46]; 
+	char host[30];
 	char name[8];
 	uint16_t port;
-}Current_Ref;
+} Reflector;
 
 typedef struct Config_Struct
-
 {
-
 	char wifi_ssid[30];
-
 	char wifi_pass[30];
-
-	Current_Ref current_reflector;
-
+	Reflector current_reflector;
 	char current_module;
-
 	char mycall[10];
-
 	char mymodule;
-
 	int codec2_mode;
-
 } Configuration;
 
-
-
 void saveEEPROM();
-
 void defaultConfig();
 
-
-
 void connectToWiFi(const char *ssid, const char *pwd);
-
-
 
 #endif

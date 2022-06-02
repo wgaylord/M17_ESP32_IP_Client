@@ -17,8 +17,6 @@
 #include "main.h"
 #include "m17.h"
 
-#include <HTTPClient.h>
-
 #define EEPROM_SIZE 512
 
 #define SPEAKER_PIN 26
@@ -71,10 +69,6 @@ bool firstRX = false;
 
 Configuration config;
 
-Reflector *refList;
-
-uint16_t refListLen = 0;
-
 unsigned long pingTimeout;
 
 // TaskHandle_t taskSensorHandle;
@@ -121,104 +115,6 @@ void defaultConfig()
 	config.codec2_mode = CODEC2_MODE_3200;
 	saveEEPROM();
 }
-
-void loadRefList()
-{
-	if (WiFi.status() == WL_CONNECTED)
-	{
-		WiFiClientSecure *client = new WiFiClientSecure;
-		if (client)
-		{
-			{
-				// Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
-				HTTPClient https;
-				Serial.print("[HTTPS] begin...\n");
-				if (https.begin(*client, "https://reflist.jwgtechs.com"))
-				{ // HTTPS
-					int httpCode = https.GET();
-					if (httpCode > 0)
-					{
-						if (httpCode == HTTP_CODE_OK)
-						{
-
-							// get length of document (is -1 when Server sends no Content-Length header)
-							int len = https.getSize();
-
-							// create buffer for read
-							uint8_t buff[128] = {0};
-
-							// get tcp stream
-							WiFiClient *stream = https.getStreamPtr();
-
-							stream->readBytes((uint8_t *)&refListLen, 2);
-
-							len -= 2;
-
-							refList = (Reflector *)malloc(sizeof(Reflector) * refListLen);
-
-							int pos = 0;
-							// read all data from server
-							while (https.connected() && (len > 0 || len == -1))
-							{
-								// get available data size
-								size_t size = stream->available();
-
-								if (size)
-								{
-									// read up to 128 byte
-									int c = stream->readBytes(((uint8_t *)refList) + pos, ((size > sizeof(buff)) ? sizeof(buff) : size));
-
-									pos += c;
-
-									if (len > 0)
-									{
-										len -= c;
-									}
-								}
-								delay(1);
-							}
-						}
-					}
-
-					https.end();
-				}
-			}
-
-			delete client;
-		}
-	}
-}
-
-
-void setReflectorIPv4(Reflector *reg)
-{
-	IPAddress address = IPAddress(reg->ipv4);
-	sprintf(config.current_reflector.host, address.toString().c_str());
-	sprintf(config.current_reflector.name, 'M17-' + (reg->designator));
-	config.current_reflector.port = reg->port;
-}
-
-void setReflectorIPv6(Reflector *reg)
-{
-	IPv6Address address = IPv6Address(reg->ipv6);
-	sprintf(config.current_reflector.host, address.toString().c_str());
-	sprintf(config.current_reflector.name, 'M17-' + (reg->designator));
-	config.current_reflector.port = reg->port;
-}
-
-void setReflectorFromDesingator(String des)
-{
-	char designator[3];
-	memcpy(designator, des.c_str(), 3);
-	for (int x = 0; x < refListLen; x += 1)
-	{
-		if (strcmp(refList[x].designator, designator))
-		{
-			setReflectorIPv4(&refList[x]);
-		}
-	}
-}
-
 
 void taskDSP(void *pvParameters);
 void taskNetwork(void *pvParameters);
@@ -449,9 +345,6 @@ void setup()
 		1,			   /* Priority of the task */
 		&taskUIHandle, /* Task handle. */
 		0);			   /* Core where the task should run */
-
-		while(!WiFi.isConnected());
-		loadRefList();
 }
 
 void loop()
@@ -472,10 +365,6 @@ void loop()
 		{
 			sprintf(config.mycall, command.substring(9).c_str());
 		}
-		if (command.startsWith(F("SetRef->")))
-		{
-			setReflectorFromDesingator(command.substring(8));
-		}
 		if (command.startsWith(F("SetRefName->")))
 		{
 			sprintf(config.current_reflector.name, command.substring(12).c_str());
@@ -495,7 +384,6 @@ void loop()
 		if (command.startsWith(F("Save")))
 		{
 			saveEEPROM();
-			ESP.restart();
 		}
 	}
 }

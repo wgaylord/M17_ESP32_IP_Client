@@ -16,7 +16,3 @@ The commands are as follows.
 "SetRefPort->17000" where 17000 is the port.   
 "SetModule->C" where C is the Module letter.  
 "Save" Saves current settings into EEPROM, rest the board after this to allow it to read the config and connect.  
-
-
-I plan on implmenting some better configuration option in the future with the addition of maybe an Oled display using I2C, to display reflector name and Module  
-and using a few more buttons to allow for sellecting if your changing the Reflector or Module.  
