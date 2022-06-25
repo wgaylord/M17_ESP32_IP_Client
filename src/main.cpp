@@ -352,7 +352,7 @@ void loop()
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	if (Serial.available())
 	{
-		String command = Serial.readString();
+		String command = Serial.readStringUntil('\n');
 		if (command.startsWith(F("WifiSSID->")))
 		{
 			sprintf(config.wifi_ssid, command.substring(10).c_str());
